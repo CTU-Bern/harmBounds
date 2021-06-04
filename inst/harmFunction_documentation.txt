@@ -1,0 +1,62 @@
+# Functions for continuous monitoring harm boundary
+# --------------------------------------------------
+# Functions intended to be used directly:
+#  1. getHarmBounds
+#  2. getAlphaPerTest
+#
+# Brief Description of functions
+#  'getHarmBounds' is the function that creates the 'potential harm' stopping bounds.
+#     It takes as input values for: 
+#      'N'        = the largest event count to create bounds for
+#      'per.test' = the nominal alpha level to use for each test
+#
+#      'harmBoundRange' = a vector of length 2, giving the range of infection counts over
+#         which the testing will be done.  In standard usage, the upper end of this range
+#         should be the same value as given in argument 'N'
+#
+#      'null.p' = the probability that an infection occurs in a vaccinee, under the null
+#         hypothesis that infection is equally likely in vaccinees and placebo recipients.
+#         Hence 'null.p' equals the fraction of the population randomized to vaccine.
+#         So under a 1:1 randomization null.p=1/2 and for a 2:1 randomization (Vacc:Plac),
+#         null.p= 2/3.
+#
+#      'dataDir' = the directory in which to store the output CSV file of bounds
+#                  If NULL, then not file is output.
+#      'outFile' = the name of the CSV file to contain the bounds. If NULL then a default
+#                  filename is constructed from inputs.  This argument is only used if
+#                  dataDir is non-NULL
+#      'verbose' = logical value controlling printing of message giving name/location
+#                  that output CSV has been saved.  Only relevant if dataDir is non-NULL
+#
+#     The output object is a data.frame with 'N' rows and 7 columns, which are:       
+#       'N' - the event total that the row provides the bounds for
+#       'V' - the stopping boundary for the number of events in the treatment group.
+#             V is for Vaccine.
+#       'P' - the number of events in the placebo group at the boundary (equals N - V).
+#             P is for Placebo.
+#       'RR' - the estimated relative risk at the boundary, estimated as
+#              ( V/P )*( null.p/(1-null.p) )
+#       (1-null.p)/
+#       'stopProb' - the probability of stopping at the given row's boundary
+#       'cumStopProb' - the probability of stopping at or before the given row's boundary
+#       'alphaVal' - the value of per.test passed to the function
+#  
+#  'getAlphaPerTest' is a function to use prior to running 'getHarmBounds' to find a 
+#       per-test alpha level that will control the sequence-wise type-I error rate 
+#       (i.e. the type-I error over the entire sequence of tests), at a particular level.
+#
+#     Inputs are:
+#       'harmBoundRange' - <same as above> 
+#       'null.p'  - <same as above>
+#       'totalAlpha' - desired total type-I error rate over the sequence of tests
+#       'alpha.interval' - the interval over which the function searches for the 
+#                          per-test alpha level.  The default should generally suffice.
+#
+#     Output: numeric vector of length 1
+#
+#     The function outputs a single numeric value - a 'per test alpha level' which, if
+#     passed to 'getHarmBounds' along with the harmBoundRange and null.p will provide 
+#     bounds that have a sequence-wise type-I error rate as given by 'totalAlpha'.
+
+
+

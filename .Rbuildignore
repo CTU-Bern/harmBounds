@@ -1,0 +1,5 @@
+^.*\.Rproj$
+^\.Rproj\.user$
+R/get_harmBounds.R
+R/harmFunction_documentation.txt
+R/safety_boundary_sim.r
