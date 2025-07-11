@@ -40,7 +40,7 @@ It can be installed from [GitHub](https://github.com/) with:
 devtools::install_github("CTU-Bern/harmBounds")
 ```
 
-```{r}
+```{r, echo=FALSE, results="hide", warning=FALSE, message=FALSE}
 devtools::load_all()
 ```
 

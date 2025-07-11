@@ -34,11 +34,6 @@ It can be installed from [GitHub](https://github.com/) with:
 devtools::install_github("CTU-Bern/harmBounds")
 ```
 
-``` r
-devtools::load_all()
-#> ℹ Loading harmBounds
-```
-
 ## Example
 
 ### Boundaries
