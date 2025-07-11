@@ -2,27 +2,33 @@
 % Please edit documentation in R/harmBound_functions.R
 \name{getAlphaPerTest}
 \alias{getAlphaPerTest}
-\title{Alpha per test}
+\title{getAlphaPerTest}
 \usage{
 getAlphaPerTest(
-  harmMonitorRange,
-  null.p,
+  nevents,
   totalAlpha = 0.05,
-  alpha.interval = c(1e-06, 0.05)
+  pH0 = 0.5,
+  alpha.interval = c(10^(-10), 0.05)
 )
 }
 \arguments{
-\item{harmMonitorRange}{harmMonitorRange}
+\item{nevents}{vector with number of events at which an interim analysis is done}
 
-\item{null.p}{null.p}
+\item{totalAlpha}{Overall type I error, 0.05 by default}
 
-\item{totalAlpha}{totalAlpha}
+\item{pH0}{proportion of events in the experimental arm under the null hypothesis,
+typically based on randomization ratio (e.g. 0.5 for a 1:1 randomization)}
 
-\item{alpha.interval}{alpha.interval}
+\item{alpha.interval}{Range for test-wise alpha, c(10^(-10),0.05) by default}
 }
 \value{
-
+Test-wide alpha
 }
 \description{
-Alpha per test
+Test-wise alpha necessary to control the overall type I error at a specified level (0.05 by default)
+}
+\examples{
+getAlphaPerTest(nevents = c(10,50,100), totalAlpha = 0.05, pH0 = 0.5)
+
+
 }

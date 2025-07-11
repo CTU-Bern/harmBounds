@@ -7,36 +7,22 @@
 # Brief Description of functions
 #  'getHarmBounds' is the function that creates the 'potential harm' stopping bounds.
 #     It takes as input values for: 
-#      'N'        = the largest event count to create bounds for
-#      'per.test' = the nominal alpha level to use for each test
-#
-#      'harmBoundRange' = a vector of length 2, giving the range of infection counts over
-#         which the testing will be done.  In standard usage, the upper end of this range
-#         should be the same value as given in argument 'N'
-#
-#      'null.p' = the probability that an infection occurs in a vaccinee, under the null
-#         hypothesis that infection is equally likely in vaccinees and placebo recipients.
-#         Hence 'null.p' equals the fraction of the population randomized to vaccine.
-#         So under a 1:1 randomization null.p=1/2 and for a 2:1 randomization (Vacc:Plac),
-#         null.p= 2/3.
-#
-#      'dataDir' = the directory in which to store the output CSV file of bounds
-#                  If NULL, then not file is output.
-#      'outFile' = the name of the CSV file to contain the bounds. If NULL then a default
-#                  filename is constructed from inputs.  This argument is only used if
-#                  dataDir is non-NULL
-#      'verbose' = logical value controlling printing of message giving name/location
-#                  that output CSV has been saved.  Only relevant if dataDir is non-NULL
-#
-#     The output object is a data.frame with 'N' rows and 7 columns, which are:       
-#       'N' - the event total that the row provides the bounds for
-#       'V' - the stopping boundary for the number of events in the treatment group.
-#             V is for Vaccine.
-#       'P' - the number of events in the placebo group at the boundary (equals N - V).
-#             P is for Placebo.
-#       'RR' - the estimated relative risk at the boundary, estimated as
-#              ( V/P )*( null.p/(1-null.p) )
-#       (1-null.p)/
+#      'nevents' = the total number of events at which a bound should be created
+#      'alpha_test' = the nominal alpha level to use for each test
+#      'p0' = proportions of events in experimental group under the null
+			(the randomization ratio in an RCT). 0.5 by default.
+#   The output is a  data frame with a row for each interim analysis and with columns for
+#	number of events (n),
+#	number of events in control and experimental group that would lead to a stop (n_treat, n_control),
+#	risk ratio (RR) at that level,
+#	sopping probability (stopProb),
+#	cumulative stopping probability (cumStopProb).
+#	and the nominal alpha for each test (alphaVal)
+      
+#       'n' - the event total that the row provides the bounds for
+#       'n_treat' - the stopping boundary for the number of events in the treatment group.
+#       'n_control' - the number of events in the control group at the boundary
+#       'RR' - the estimated relative risk at the boundary
 #       'stopProb' - the probability of stopping at the given row's boundary
 #       'cumStopProb' - the probability of stopping at or before the given row's boundary
 #       'alphaVal' - the value of per.test passed to the function
@@ -46,8 +32,8 @@
 #       (i.e. the type-I error over the entire sequence of tests), at a particular level.
 #
 #     Inputs are:
-#       'harmBoundRange' - <same as above> 
-#       'null.p'  - <same as above>
+#       'nevents' - <same as above> 
+#       'p0'  - <same as above>
 #       'totalAlpha' - desired total type-I error rate over the sequence of tests
 #       'alpha.interval' - the interval over which the function searches for the 
 #                          per-test alpha level.  The default should generally suffice.

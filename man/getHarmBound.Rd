@@ -2,61 +2,33 @@
 % Please edit documentation in R/harmBound_functions.R
 \name{getHarmBound}
 \alias{getHarmBound}
-\title{Harm boundaries for safety testing
-We consider the total number of infected participants to be 'N' and assume apriori
-and equal likelihood of infection for vaccinees as for placebos.  So the number of
-infected vaccinees should follow a binomial distribution with size N and probability
-p=\code{null.p} (where \code{null.p} is the proportion of vaccinees in the trial).  We wish to
-have a total probability of a "type I error" (stopping the trial for 'harm' when
-there is no real difference between vaccine and placebo) of e.g .05.  Our approach
-will be to test for harm after each new infection, and we wish to find a fixed
-'alpha' value to use for each test, so that the overall prob. of a false positive
-over the course of the trial is .05.}
+\title{Harm boundaries for safety testing}
 \usage{
-getHarmBound(
-  N,
-  per.test,
-  harmBoundRange,
-  null.p,
-  dataDir = NULL,
-  outFile = NULL,
-  verbose = TRUE
-)
+getHarmBound(nevents, alpha_test, pH0)
 }
 \arguments{
-\item{N}{the total number of infections to create bounds for}
+\item{nevents}{vector with number of events at which an interim analysis is done}
 
-\item{per.test}{the nominal alpha level to use for each test}
+\item{alpha_test}{the nominal alpha level to use for each test}
 
-\item{harmBoundRange}{a vector of length 2, giving the range of infection counts over
-which the testing will be done.  In standard usage, the upper end of this range
-should be the same value as given in argument \code{N}}
-
-\item{null.p}{the probability that an infection occurs in a vaccinee, under the null
-hypothesis that infection is equally likely in vaccinees and placebo recipients.
-Hence \code{null.p} equals the fraction of the population randomized to vaccine.
-So under a 1:1 randomization \code{null.p}=1/2 and for a 2:1 randomization (Vacc:Plac),
-\code{null.p}= 2/3.}
-
-\item{dataDir}{the directory in which to store the output CSV file of bounds
-If NULL, then not file is output.}
-
-\item{outFile}{the name of the CSV file to contain the bounds. If NULL then a default
-filename is constructed from inputs.  This argument is only used if
-\code{dataDir} is non-NULL}
-
-\item{verbose}{logical value controlling printing of message giving name/location
-that output CSV has been saved.  Only relevant if \code{dataDir} is non-NULL}
+\item{pH0}{proportion of events in the experimental arm under the null hypothesis,
+typically based on randomization ratio (e.g. 0.5 for a 1:1 randomization)}
 }
 \value{
-
+data frame with a row for each interim analysis and with columns for
+number of events (n),
+number of events in control and experimental group that would lead to a stop (n_treat, n_control),
+risk ratio (RR) at that level,
+sopping probability (stopProb),
+cumulative stopping probability (cumStopProb).
+and the nominal alpha for each test (alphaVal)
 }
 \description{
-To accomplish this, we iteratively choose values alpha, generate a set of
-'stopping bounds' corresponding to that alpha, and then estimate the overall type I
-error rate for those bounds.  We then adjust our alpha value (up or down), as needed,
-and repeat until the type I error is as desired. Obviously, due to the discreteness
-of the distribution, the desired type I error is unlikely to be attainable exactly.
-But if the \code{harmBoundRange} is not too small, a value reasonably close to that desired
-should be possible.
+Calculates the boundaries at each interim analysis, i.e. the number of events in the experimental group
+that would lead to a stopping of the trial based on a binomial exact test,
+assuming that the events should be equally distributed amont both groups.
+The indicated scenario (and all more extreme) would lead to a rejection of H0 (equal distribution) and a stopping for safety.
+}
+\examples{
+getHarmBound(nevents=c(10,50,100), alpha_test=0.025, pH0=0.5)
 }
