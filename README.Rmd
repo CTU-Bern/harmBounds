@@ -4,12 +4,14 @@ output: github_document
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
+
 ```{r, include = FALSE}
 knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>",
   fig.path = "man/figures/README-",
-  out.width = "100%"
+  out.width = "100%",
+  size = "footnotesize"
 )
 ```
 
@@ -20,94 +22,273 @@ knitr::opts_chunk$set(
 [![R-CMD-standard](https://github.com/CTU-Bern/harmBounds/workflows/R-CMD-standard/badge.svg)](https://github.com/CTU-Bern/harmBounds/actions)
 <!-- badges: end -->
 
-The harmBounds package calculates boundaries, simulates data and generates plots for safety monitoring using an event based approach.
+The harmBounds package calculates stopping probabilities, defines stopping boundaries and generates plots for safety monitoring using an event based approach.
 
-The idea is to do simple one sample binomial exact tests on the proportion of events in the experimental arm.
-
-A safety problem is claimed if there is evidence that this is higher than what would be expected
+The idea is to do simple one sample binomial exact tests on the proportion of events in the experimental arm. 
+A safety problem is claimed if there is evidence that this proportion higher than what would be expected
  from the number of people under observation in the two arms (e.g. 0.5 in a 1:1 randomized trial). 
  
-This can be done continuously or at pre-specified total number of events.The nominal test-wise alpha would be calibrated to obtain desired properties, such as a certain proportion of stopping under null and alternative scenarios
-	or an overall type I error control (which we do not necessarily recommend for safety testing).
+The safety monitoring can be done continuously after every event or at a pre-specified total number of events.
+The nominal test-wise alpha would be calibrated to obtain desired properties, such as a certain proportion of stopping under alternative scenarios of some degree of safety problems (the power). An overall type I error control can also be implemented but we would usually not recommend that for safety testing, as the consequence of a type II error (not stopping for safety if the intervention is not safe) is arguably worse than of a type I error (stopping if the intervention is safe).
 	
 
 ## Installation
 
-It can be installed from [GitHub](https://github.com/) with:
+The package can be installed from [GitHub](https://github.com/) with:
 
 ```{r, eval=FALSE}
 # install.packages("devtools")
-devtools::install_github("CTU-Bern/harmBounds")
+devtools::install_github("CTU-Bern/harmBounds",)
 ```
 
 ```{r, echo=FALSE, results="hide", warning=FALSE, message=FALSE}
 devtools::load_all()
 ```
 
-## Example
+## Calculation of boundaries
 
-### Boundaries
-
-To get boundaries, e.g. for a trial with 3 safety interim analyses after 10, 50 and 100 events (in total over both groups)
-  using a nominal test-wise alpha of 0.025.
+Stopping boundaries can be calculated with function *getHarmBound*.
+Let's assume a trial with 10 safety interim analyses after every 10 events (combined over both groups) up to a total of 100 events and a nominal test-wise alpha of 0.025.
 
 ```{r}
-hb<-getHarmBound(nevents=c(10,50,100), alpha_test = 0.025, pH0 = 0.5)
+hb<-getHarmBound(nevents = seq(10, 100, by = 10), alpha_test = 0.025, pH0 = 0.5)
 hb
 ```
 
-'n_treat' indicates the minimal number of events in the treatment group that would lead to a stopping of the trial.
-The overall type I error is `r round(hb$cumStopProb[nrow(hb)]*100,1)`%.
 
-If we would like to control the type I error at a specific level, We can get the test-wise alpha using:
+The data frame *bounds* specifies the boundaries at each interim analysis, *events_exp* is the minimal number of events in the experimental group that would lead to a stopping of the trial, *rr* the corresponding risk ratio and *cum_stop_prob_H0* the cumulative stopping probability under the null hypothesis of no difference between the groups.
+The overall type I error of the safety testing is `r round(hb$cum_stop_prob$cum_stop_prob*100,1)`%.
+
+If we would like to control the type I error at a specific level (which we do not necessarily recommend, see above), the test-wise alpha can be obtained using function *getAlphaPerTest*.
 
 ```{r}
-alphaPerTest <- getAlphaPerTest(nevents = c(10,50,100), pH0= 0.5, totalAlpha = 0.05)
+alphaPerTest<-getAlphaPerTest(nevents = seq(10, 100, by = 10), pH0 = 0.5, totalAlpha = 0.05)
 
 alphaPerTest
 
-getHarmBound(nevents=c(10,50,100), alpha_test = alphaPerTest, pH0 = 0.5)
+hb<-getHarmBound(nevents = seq(10, 100, by = 10), alpha_test = alphaPerTest, pH0 = 0.5)
+hb 
+
 ```
 
-The overall type I error is `r round(hb$cumStopProb[nrow(hb)]*100,1)`%, i.e. as close to 5% as possible (given the discrete nature of the test).
+The overall type I error is `r round(hb$cum_stop_prob$cum_stop_prob*100,1)`%, i.e. as close to 5% as possible (given the discrete nature of the test).
+Note that with this example that is slightly higher than 5%. If a strict control at 5% would required a *totalAlpha* of 0.049 would have to be chosen.
 
+## Plotting of boundaries
 
-### Simulation
+The boundaries can be plotted using *harmboundPlot* (or the harmbound.plot-method):  
 
-To simulate data under the null hypothesis (H0) and an alternative with 80% events in the experimental arm (H1).
+```{r message=FALSE, warning=FALSE}
+hb<-getHarmBound(nevents = seq(10, 100, by = 10), alpha_test = 0.025, pH0 = 0.5)
 
-```{r}
+plot(hb) + 
+  scale_x_continuous(breaks = seq(0, 100, by = 10), minor_breaks = NULL) +
+  scale_y_continuous(breaks = seq(0, 100, by = 10), minor_breaks = NULL) 
+```
+
+Where the bars indicate the time points of the interim analysis with the rejection region in red,
+  and the dashed line represents the expectation (can be removed with 'H0line = FALSE')
+
+Continuous monitoring could also be implemented:
+
+```{r message=FALSE, warning=FALSE}
+hb<-getHarmBound(nevents = 0:100, alpha_test = 0.025, pH0 = 0.5)
+
+plot(hb) + 
+  scale_x_continuous(breaks = seq(0, 100, by = 10), minor_breaks = NULL) +
+  scale_y_continuous(breaks = seq(0, 100, by = 10), minor_breaks = NULL) 
+```
+
+Observed data can be added as vector with 0 and 1, indicated the sequence of the groups in which events occured (0 being the control and 1 the experimental group).
+
+```{r message=FALSE, warning=FALSE}
+hb<-getHarmBound(nevents = seq(10, 100, by = 10), alpha_test = 0.025, pH0 = 0.5)
+
+set.seed(123)
+eventgroups<-rbinom(n = 100, size = 1, prob = 0.5)
+
+plot(hb,observed=eventgroups) + 
+  scale_x_continuous(breaks = seq(0, 100, by = 10), minor_breaks = NULL) +
+  scale_y_continuous(breaks = seq(0, 100, by = 10), minor_breaks = NULL) 
+```
+The boundary is not breached at any of the 10 interim analysis.
+
+Or with continuous monitoring:
+
+```{r message=FALSE, warning=FALSE}
 set.seed(123)
 
-sim_safety_stop(nevents = c(10,50,100), pH1 = 0.5, alpha_test = 0.025)
+hb<-getHarmBound(nevents = 0:100, alpha_test = 0.025, pH0 = 0.5)
 
-sim_safety_stop(nevents = c(10,50,100), pH1 = 0.6, alpha_test = 0.025)
+eventgroups<-rbinom(n = 100, size = 1, prob = 0.5)
+
+plot(hb, observed = eventgroups) + 
+  scale_x_continuous(breaks = seq(0, 100, by = 10), minor_breaks = NULL) +
+  scale_y_continuous(breaks = seq(0, 100, by = 10), minor_breaks = NULL) 
 ```
 
-And repeat that to get the proportion of trials with a stop (more simulations would be necessary to get precise results)
+## Determine test-wise alpha
+
+To set the test-wise alpha, we recommend to control the power rather than the type I error.
+  I.e. to check that a sufficient proportion of trials are stopped under 
+  an appropriate alternative hypothesis (reflecting a safety problem).
+
+Stopping probabilities for alternatives can also be obtained  with the *getHarmBound* function.
+The alternative hypothesis can be specified as 
+
+- pH1: the proportion of the events in the experimental group, 
+  with 0.5 being the null scenario for a 1:1 rando, and numbers from 0.5 to 1 indicating a 
+  safety problem.
+  
+- rrH1: the risk ratio (experimental / control), with 1 being the null scenario and numbers >1 indicating a safety problem.
+
+- rdH1: the risk difference (experimental minus control), with 0 being the null scenario and numbers >0 indicating a safety problem. Here the control proportion (r0) and the total number of participants (n) have to be specified.
+
+- orH1: the odds ratio (experimental / control), with 1 being the null scenario and number >1 indicating a safety problem. Here the control proportion (r0) has to be specified.
+
 
 ```{r}
+#with proportion of events in the experimental group:
+hb<-getHarmBound(nevents = seq(10, 100, by = 10), alpha_test = 0.025, pH0 = 0.5, pH1 = 0.6)
+hb
 
-set.seed(123)
+#with a risk ratio
+hb<-getHarmBound(nevents = seq(10, 100, by = 10), alpha_test = 0.025, pH0 = 0.5, rrH1 = 1.5)
+hb
+```
 
-ssp0<-vapply(1:100,
-	function(x) sim_safety_stop(nevents = c(10,50,100), pH0 = 0.5, pH1 = 0.5,
-		alpha_test=0.025)$nstop,
-	numeric(1))
+We would stop in `r round(100*hb$bound$cum_stop_prob_H0[length(hb$bound$cum_stop_prob_H0)],1)`% of the trials under the null (no safety problem) and in `r round(100*hb$bound$cum_stop_prob_H1[length(hb$bound$cum_stop_prob_H1)],1)`% under the alternative (safety problem with 60% of the events in the experimental group, corresponding to a risk ratio of 1.5).
 
-mean(ssp0>0)
+We can also specify a vector of alternatives and plot the cumulative stopping probabilities:
 
-ssp1<-vapply(1:100,
-	function(x) sim_safety_stop(nevents = c(10,50,100), pH0 = 0.5, pH1 = 0.6,
-		alpha_test=0.025)$nstop,
-	numeric(1))
+```{r}
+hb<-getHarmBound(nevents = seq(10, 100, by = 10), alpha_test = 0.025, pH0 = 0.5, 
+  pH1 = seq(0,1,l=100))
 
-mean(ssp1>0)
+hb$cum_stop_prob %>%
+  ggplot(aes(x = p, y = cum_stop_prob)) + 
+  	geom_line() +
+    ylab("Stopping probability") +
+    xlab("Proportion of events in experimental group") +
+    scale_x_continuous(breaks=seq(0,1,by=0.2),minor_breaks=seq(0,1,by=0.1)) +
+  	scale_y_continuous(breaks=seq(0,1,by=0.2),minor_breaks=seq(0,1,by=0.1))
 
 ```
-We would stop in `r round(100*mean(ssp0>0),1)`% of the trials under the null (no safety problem) and in `r round(100*mean(ssp1>0),1)`% under the alternative (safety problem).
+
+This can be done for a grid of alphas:
+
+```{r, warning=FALSE}
+alphaPerTest <- getAlphaPerTest(nevents = seq(10, 100, by = 10), pH0 = 0.5,
+  totalAlpha = 0.05)
+alist<-c(0.001,0.01,alphaPerTest,0.025,0.05)
+
+hbl<-lapply(alist,function(x)
+  getHarmBound(nevents = seq(10, 100, by = 10), alpha_test = x, pH0 = 0.5,
+  pH1 = seq(0,1,l=100))$cum_stop_prob)
+
+hbd<-data.frame(do.call(rbind,hbl),alpha=rep(alist,each=nrow(hbl[[1]])))
+hbd$alpha<-as.factor(round(hbd$alpha,4))
+
+hbd %>% 
+	ggplot(aes(x = p, y = cum_stop_prob, colour=alpha)) + 
+  	geom_line() +
+    ylab("Stopping probability") +
+    xlab("Proportion of events in experimental group") +
+  	scale_x_continuous(breaks=seq(0,1,by=0.1),limits=c(0.2,0.8)) +
+  	scale_y_continuous(breaks=seq(0,1,by=0.2))
+
+```
+
+or using risk ratios:
+```{r, warning=FALSE}
+alphaPerTest <- getAlphaPerTest(nevents = seq(10, 100, by = 10), pH0 = 0.5,
+  totalAlpha = 0.05)
+alist<-c(0.001,0.01,alphaPerTest,0.025,0.05)
+
+hbl<-lapply(alist,function(x)
+  getHarmBound(nevents = seq(10, 100, by = 10), alpha_test = x, pH0 = 0.5,
+  rrH1 = seq(0,10,l=100))$cum_stop_prob)
+
+hbd<-data.frame(do.call(rbind,hbl),alpha=rep(alist,each=nrow(hbl[[1]])))
+hbd$alpha<-as.factor(round(hbd$alpha,4))
+hbd$lrr<-log(hbd$rr)
+
+hbd %>% 
+	ggplot(aes(x = rr, y = cum_stop_prob, colour=alpha)) + 
+  	geom_line() +
+    ylab("Stopping probability") +
+    xlab("Risk ratio (experimental/control)") +
+    scale_x_continuous(trans='log', breaks=c(0.5,0.75,1,1.5,2,3,4),minor_breaks=NULL,limits=c(0.5,5)) +
+  	scale_y_continuous(breaks=seq(0,1,by=0.2))
+
+```
 
 
-We could now use different test-wise alphas to define an overall design with desired properties, i.e. enough stopping under the alternative while not stopping too often under the null.
+The step-wise alpha that leads to a reasonable stopping probability under an appropriate alternative can be selected.
+However, the steepness of the curve is not influenced by the alpha. We can only choose between making more type I or II errors but not reduce the overall error rate.
+
+```{r, echo=FALSE, include=FALSE}
+hb<-getHarmBound(nevents = seq(10, 100, by = 10), alpha_test = 0.05, pH0 = 0.5,
+  rrH1 = 1.5)$cum_stop_prob
+
+hb2<-getHarmBound(nevents = seq(10, 100, by = 10), alpha_test = alphaPerTest, pH0 = 0.5,
+  rrH1 = 1.5)$cum_stop_prob
+```
+
+We could e.g. specify that at least 70% of the trials should be stopped if the risk of having a safety event increase by half (i.e. a risk ratio of 1.5), i.e. a test-wise alpha of close to 0.05. However, this would also lead to a stopping of `r round(hb$cum_stop_prob[hb$p==0.5]*100)`% of the trials under the null.
+
+On the other hand, if we control the type I error at 5% using a test-wise alpha of `r round(alphaPerTest,4)`, only `r round(hb2$cum_stop_prob[hb2$p==0.6]*100)`% of the trials are stopped if there is a safety problem with a risk ratio of 1.5.
+
+The same trade-off between type I and II errors can be observed when changing the number of interim analyses - the steepness of the curves is not affected.
+
+```{r, warning=FALSE}
+nelist<-list(c(10,20,50,100),seq(10, 100, by = 10),seq(10, 100, by = 1))
+
+hbl<-lapply(nelist,function(x)
+  getHarmBound(nevents = x, alpha_test = 0.025, pH0 = 0.5,
+  rrH1 = seq(0,10,l=100))$cum_stop_prob)
+
+nis<-unlist(lapply(nelist,length))
+hbd<-data.frame(do.call(rbind,hbl),ni=rep(nis,each=nrow(hbl[[1]])))
+hbd$ni<-as.factor(hbd$ni)
+hbd$lrr<-log(hbd$rr)
+
+hbd %>% 
+	ggplot(aes(x = rr, y = cum_stop_prob, colour=ni)) + 
+  	geom_line() +
+    ylab("Stopping probability") +
+    xlab("Risk ratio (experimental/control)") +
+    scale_x_continuous(trans='log', breaks=c(0.5,0.75,1,1.5,2,3,4),minor_breaks=NULL,limits=c(0.5,5)) +
+  	scale_y_continuous(breaks=seq(0,1,by=0.2)) +
+    labs(colour="Number of IAs")
+
+```
+
+
+To actually decrease the total error rates (i.e. get steeper curves), we would need a higher total number of events:
+
+```{r, warning=FALSE}
+
+nelist<-list(seq(10, 20, by = 10),seq(10, 50, by = 10), seq(10, 100, by = 10), seq(10, 200, by = 10))
+
+hbl<-lapply(nelist,function(x)
+  getHarmBound(nevents = x, alpha_test = 0.025, pH0 = 0.5,
+  rrH1 = seq(0,10,l=100))$cum_stop_prob)
+
+nis<-unlist(lapply(nelist,max))
+hbd<-data.frame(do.call(rbind,hbl),ni=rep(nis,each=nrow(hbl[[1]])))
+hbd$ni<-as.factor(hbd$ni)
+hbd$lrr<-log(hbd$rr)
+
+hbd %>% 
+	ggplot(aes(x = rr, y = cum_stop_prob, colour=ni)) + 
+  	geom_line() +
+    ylab("Stopping probability") +
+    xlab("Risk ratio (experimental/control)") +
+    scale_x_continuous(trans='log', breaks=c(0.5,0.75,1,1.5,2,3,4),minor_breaks=NULL,limits=c(0.5,5)) +
+  	scale_y_continuous(breaks=seq(0,1,by=0.2)) +
+    labs(colour="Total number of events")
+
+```
 
 

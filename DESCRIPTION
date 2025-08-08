@@ -1,7 +1,7 @@
 Package: harmBounds
 Type: Package
 Title: Harm Boundaries for Clinical Trials
-Version: 0.2.0
+Version: 0.3.0
 Author: Yunda, Lukas
 Maintainer: The package maintainer <lukas.buetikofer@unibe.ch>
 Description: Calculates boundaries, simulates data and generates plots for saftey monitoring.
@@ -14,3 +14,7 @@ BugReports: https://github.com/CTU-Bern/harmBounds/issues
 Suggests: 
     testthat (>= 3.0.0)
 Config/testthat/edition: 3
+Imports: 
+    ggplot2
+Depends: 
+    R (>= 2.10)
