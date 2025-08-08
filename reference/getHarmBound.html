@@ -20,7 +20,7 @@ The indicated scenario (and all more extreme) would lead to a rejection of H0 (e
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">harmBounds</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.2.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.3.0</span>
       </span>
     </div>
 
@@ -59,7 +59,17 @@ The indicated scenario (and all more extreme) would lead to a rejection of H0 (e
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">getHarmBound</span><span class="op">(</span><span class="va">nevents</span>, <span class="va">alpha_test</span>, <span class="va">pH0</span><span class="op">)</span></span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">getHarmBound</span><span class="op">(</span></span>
+<span>  <span class="va">nevents</span>,</span>
+<span>  <span class="va">alpha_test</span>,</span>
+<span>  <span class="va">pH0</span>,</span>
+<span>  pH1 <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  rrH1 <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  orH1 <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  rdH1 <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  r0 <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  n <span class="op">=</span> <span class="cn">NULL</span></span>
+<span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
@@ -78,25 +88,136 @@ The indicated scenario (and all more extreme) would lead to a rejection of H0 (e
 <dd><p>proportion of events in the experimental arm under the null hypothesis,
 typically based on randomization ratio (e.g. 0.5 for a 1:1 randomization)</p></dd>
 
+
+<dt id="arg-ph-">pH1<a class="anchor" aria-label="anchor" href="#arg-ph-"></a></dt>
+<dd><p>optional alternative, numeric vector, proportion of events in the experimental arm</p></dd>
+
+
+<dt id="arg-rrh-">rrH1<a class="anchor" aria-label="anchor" href="#arg-rrh-"></a></dt>
+<dd><p>alternative specification of alternative as risk ratio (experimental / control)</p></dd>
+
+
+<dt id="arg-orh-">orH1<a class="anchor" aria-label="anchor" href="#arg-orh-"></a></dt>
+<dd><p>alternative specification of alternative as risk ratio (experimental / control). Requires the control proportion (r0).</p></dd>
+
+
+<dt id="arg-rdh-">rdH1<a class="anchor" aria-label="anchor" href="#arg-rdh-"></a></dt>
+<dd><p>alternative specification of alternative as risk difference (experimental - control). Requires the control proportion (r0) and the number of participants (n).</p></dd>
+
+
+<dt id="arg-r-">r0<a class="anchor" aria-label="anchor" href="#arg-r-"></a></dt>
+<dd><p>risk in the control group. Required if the alternative is given as risk difference or odds ratio.</p></dd>
+
+
+<dt id="arg-n">n<a class="anchor" aria-label="anchor" href="#arg-n"></a></dt>
+<dd><p>total number of participants. Required if the alternative is given as risk difference.</p></dd>
+
 </dl></div>
     <div id="value">
     <h2>Value</h2>
-    <p>data frame with a row for each interim analysis and with columns for
+    <p>a list with 2 data frames: bounds and cum_stop_prob.
+bounds has a row for each interim analysis and columns for
 number of events (n),
 number of events in control and experimental group that would lead to a stop (n_treat, n_control),
-risk ratio (RR) at that level,
-sopping probability (stopProb),
-cumulative stopping probability (cumStopProb).
-and the nominal alpha for each test (alphaVal)</p>
+risk ratio (rr) at that level,
+and the nominal alpha for each test (alpha_test)
+ the null proportion (pH0),
+sopping probability (stop_prob_H0), and
+cumulative stopping probability (cum_stop_prob_H1), and
+ if pH1!=NULL,
+the alternative proportion (pH1, first one if pH1 has length&gt;1),
+sopping probability under the first H1 (stop_prob_H1),
+cumulative stopping probability under the first H1 (cum_stop_prob).
+cum_stop_prob includes the cumulative stopping probabilities for
+the null and each alternative.</p>
     </div>
 
     <div id="ref-examples">
     <h2>Examples</h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="fu">getHarmBound</span><span class="op">(</span>nevents<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">10</span>,<span class="fl">50</span>,<span class="fl">100</span><span class="op">)</span>, alpha_test<span class="op">=</span><span class="fl">0.025</span>, pH0<span class="op">=</span><span class="fl">0.5</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>       n n_treat n_control       RR   stopProb cumStopProb alphaVal</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 10   10       9         1 9.000000 0.01074219  0.01074219    0.025</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 50   50      33        17 1.941176 0.01490030  0.02564249    0.025</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 100 100      61        39 1.564103 0.01194192  0.03758441    0.025</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $bounds</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   events events_exp events_control       rr alpha_test pH0 stop_prob_H0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1     10          9              1 9.000000      0.025 0.5   0.01074219</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2     50         33             17 1.941176      0.025 0.5   0.01490030</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3    100         61             39 1.564103      0.025 0.5   0.01194192</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   cum_stop_prob_H0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1       0.01074219</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2       0.02564249</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3       0.03758441</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $cum_stop_prob</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     p cum_stop_prob hyp</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1 0.5    0.03758441  H0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> attr(,"class")</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "harmbound" "list"     </span>
+<span class="r-in"><span><span class="co">#adding an alternative</span></span></span>
+<span class="r-in"><span><span class="fu">getHarmBound</span><span class="op">(</span>nevents<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">10</span>,<span class="fl">50</span>,<span class="fl">100</span><span class="op">)</span>, alpha_test<span class="op">=</span><span class="fl">0.025</span>, pH0<span class="op">=</span><span class="fl">0.5</span>, pH1<span class="op">=</span><span class="fl">0.6</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $bounds</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   events events_exp events_control       rr alpha_test pH0 stop_prob_H0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1     10          9              1 9.000000      0.025 0.5   0.01074219</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2     50         33             17 1.941176      0.025 0.5   0.01490030</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3    100         61             39 1.564103      0.025 0.5   0.01194192</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   cum_stop_prob_H0 pH1 stop_prob_H1 cum_stop_prob_H1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1       0.01074219 0.6    0.0463574        0.0463574</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2       0.02564249 0.6    0.2098108        0.2561682</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3       0.03758441 0.6    0.2505214        0.5066895</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $cum_stop_prob</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   hyp   p cum_stop_prob</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1  H0 0.5    0.03758441</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2  H1 0.6    0.50668952</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> attr(,"class")</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "harmbound" "list"     </span>
+<span class="r-in"><span><span class="co">#or several alternatives</span></span></span>
+<span class="r-in"><span><span class="fu">getHarmBound</span><span class="op">(</span>nevents<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">10</span>,<span class="fl">50</span>,<span class="fl">100</span><span class="op">)</span>, alpha_test<span class="op">=</span><span class="fl">0.025</span>, pH0<span class="op">=</span><span class="fl">0.5</span>, pH1<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span><span class="fl">0</span>,<span class="fl">1</span>,by<span class="op">=</span><span class="fl">0.1</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $bounds</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   events events_exp events_control       rr alpha_test pH0 stop_prob_H0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1     10          9              1 9.000000      0.025 0.5   0.01074219</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2     50         33             17 1.941176      0.025 0.5   0.01490030</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3    100         61             39 1.564103      0.025 0.5   0.01194192</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   cum_stop_prob_H0 pH1 stop_prob_H1 cum_stop_prob_H1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1       0.01074219   0            0                0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2       0.02564249   0            0                0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3       0.03758441   0            0                0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $cum_stop_prob</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>    hyp   p cum_stop_prob</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1   H0 0.5  3.758441e-02</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2   H1 0.0  0.000000e+00</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3   H1 0.1  9.100000e-09</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4   H1 0.2  4.198402e-06</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 5   H1 0.3  1.438344e-04</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 6   H1 0.4  1.856785e-03</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 7   H1 0.5  3.758441e-02</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 8   H1 0.6  5.066895e-01</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 9   H1 0.7  9.817810e-01</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 10  H1 0.8  9.999970e-01</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 11  H1 0.9  1.000000e+00</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 12  H1 1.0  1.000000e+00</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> attr(,"class")</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "harmbound" "list"     </span>
+<span class="r-in"><span><span class="co">#or as risk ratio</span></span></span>
+<span class="r-in"><span><span class="fu">getHarmBound</span><span class="op">(</span>nevents<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">10</span>,<span class="fl">50</span>,<span class="fl">100</span><span class="op">)</span>, alpha_test<span class="op">=</span><span class="fl">0.025</span>, pH0<span class="op">=</span><span class="fl">0.5</span>, rrH1<span class="op">=</span><span class="fl">1.5</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $bounds</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   events events_exp events_control       rr alpha_test pH0 stop_prob_H0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1     10          9              1 9.000000      0.025 0.5   0.01074219</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2     50         33             17 1.941176      0.025 0.5   0.01490030</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3    100         61             39 1.564103      0.025 0.5   0.01194192</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   cum_stop_prob_H0 pH1 stop_prob_H1 cum_stop_prob_H1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1       0.01074219 0.6    0.0463574        0.0463574</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2       0.02564249 0.6    0.2098108        0.2561682</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3       0.03758441 0.6    0.2505214        0.5066895</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $cum_stop_prob</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   hyp   p  rr cum_stop_prob</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1  H0 0.5 1.0    0.03758441</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2  H1 0.6 1.5    0.50668952</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> attr(,"class")</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "harmbound" "list"     </span>
 </code></pre></div>
     </div>
   </div>
