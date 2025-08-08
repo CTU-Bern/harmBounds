@@ -4,7 +4,17 @@
 \alias{getHarmBound}
 \title{Harm boundaries for safety testing}
 \usage{
-getHarmBound(nevents, alpha_test, pH0)
+getHarmBound(
+  nevents,
+  alpha_test,
+  pH0,
+  pH1 = NULL,
+  rrH1 = NULL,
+  orH1 = NULL,
+  rdH1 = NULL,
+  r0 = NULL,
+  n = NULL
+)
 }
 \arguments{
 \item{nevents}{vector with number of events at which an interim analysis is done}
@@ -13,15 +23,35 @@ getHarmBound(nevents, alpha_test, pH0)
 
 \item{pH0}{proportion of events in the experimental arm under the null hypothesis,
 typically based on randomization ratio (e.g. 0.5 for a 1:1 randomization)}
+
+\item{pH1}{optional alternative, numeric vector, proportion of events in the experimental arm}
+
+\item{rrH1}{alternative specification of alternative as risk ratio (experimental / control)}
+
+\item{orH1}{alternative specification of alternative as risk ratio (experimental / control). Requires the control proportion (r0).}
+
+\item{rdH1}{alternative specification of alternative as risk difference (experimental - control). Requires the control proportion (r0) and the number of participants (n).}
+
+\item{r0}{risk in the control group. Required if the alternative is given as risk difference or odds ratio.}
+
+\item{n}{total number of participants. Required if the alternative is given as risk difference.}
 }
 \value{
-data frame with a row for each interim analysis and with columns for
+a list with 2 data frames: bounds and cum_stop_prob.
+bounds has a row for each interim analysis and columns for
 number of events (n),
 number of events in control and experimental group that would lead to a stop (n_treat, n_control),
-risk ratio (RR) at that level,
-sopping probability (stopProb),
-cumulative stopping probability (cumStopProb).
-and the nominal alpha for each test (alphaVal)
+risk ratio (rr) at that level,
+and the nominal alpha for each test (alpha_test)
+ the null proportion (pH0),
+sopping probability (stop_prob_H0), and
+cumulative stopping probability (cum_stop_prob_H1), and
+ if pH1!=NULL,
+the alternative proportion (pH1, first one if pH1 has length>1),
+sopping probability under the first H1 (stop_prob_H1),
+cumulative stopping probability under the first H1 (cum_stop_prob).
+cum_stop_prob includes the cumulative stopping probabilities for
+the null and each alternative.
 }
 \description{
 Calculates the boundaries at each interim analysis, i.e. the number of events in the experimental group
@@ -31,4 +61,10 @@ The indicated scenario (and all more extreme) would lead to a rejection of H0 (e
 }
 \examples{
 getHarmBound(nevents=c(10,50,100), alpha_test=0.025, pH0=0.5)
+#adding an alternative
+getHarmBound(nevents=c(10,50,100), alpha_test=0.025, pH0=0.5, pH1=0.6)
+#or several alternatives
+getHarmBound(nevents=c(10,50,100), alpha_test=0.025, pH0=0.5, pH1=seq(0,1,by=0.1))
+#or as risk ratio
+getHarmBound(nevents=c(10,50,100), alpha_test=0.025, pH0=0.5, rrH1=1.5)
 }
