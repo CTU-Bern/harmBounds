@@ -5,8 +5,7 @@
 
 <!-- badges: start -->
 
-[![R-CMD-full](https://github.com/CTU-Bern/harmBounds/workflows/R-CMD-full/badge.svg)](https://github.com/CTU-Bern/harmBounds/actions)
-[![R-CMD-standard](https://github.com/CTU-Bern/harmBounds/workflows/R-CMD-standard/badge.svg)](https://github.com/CTU-Bern/harmBounds/actions)
+[![R-CMD-check](https://github.com/CTU-Bern/harmBounds/workflows/R-CMD-check/badge.svg)](https://github.com/CTU-Bern/harmBounds/actions)
 <!-- badges: end -->
 
 The harmBounds package calculates stopping probabilities, defines
