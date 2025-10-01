@@ -64,7 +64,6 @@ getAlphaPerTest <- function(nevents,
 #' bounds has a row for each interim analysis and columns for
 #'	number of events (n),
 #'	number of events in control and experimental group that would lead to a stop (n_treat, n_control),
-#'	risk ratio (rr) at that level,
 #'	and the nominal alpha for each test (alpha_test)
 #'  the null proportion (pH0),
 #'	sopping probability (stop_prob_H0), and
@@ -238,10 +237,10 @@ getHarmBound <- function(nevents,alpha_test,pH0,
 					pH0 = pH0)
 
 	ord.columns <- c("n","n_treat","n_control",
-		"rr","alpha_test","pH0","stop_prob","cum_stop_prob")
+		"alpha_test","pH0","stop_prob","cum_stop_prob")
 	boundOut <- boundOut[, ord.columns]
 	colnames(boundOut)<-c("events","events_exp","events_control",
-		"rr","alpha_test",
+		"alpha_test",
 		"pH0","stop_prob_H0","cum_stop_prob_H0")
 
 	# add alternative if one

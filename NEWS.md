@@ -13,3 +13,7 @@ harmBounds 0.3.0
 ------------------
 plot functions
 specification of alternative in getHarmBound
+
+harmBounds 0.3.1
+------------------
+remove rr from harmBound output
