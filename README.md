@@ -34,7 +34,7 @@ The package can be installed from [GitHub](https://github.com/) with:
 
 ``` r
 # install.packages("devtools")
-devtools::install_github("CTU-Bern/harmBounds",)
+devtools::install_github("CTU-Bern/harmBounds")
 ```
 
 ## Calculation of boundaries
