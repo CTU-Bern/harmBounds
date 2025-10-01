@@ -79,7 +79,7 @@
 <p>The package can be installed from <a href="https://github.com/" class="external-link">GitHub</a> with:</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># install.packages("devtools")</span></span>
-<span><span class="fu">devtools</span><span class="fu">::</span><span class="fu">install_github</span><span class="op">(</span><span class="st">"CTU-Bern/harmBounds"</span>,<span class="op">)</span></span></code></pre></div>
+<span><span class="fu">devtools</span><span class="fu">::</span><span class="fu">install_github</span><span class="op">(</span><span class="st">"CTU-Bern/harmBounds"</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="calculation-of-boundaries">Calculation of boundaries<a class="anchor" aria-label="anchor" href="#calculation-of-boundaries"></a>
@@ -89,17 +89,17 @@
 <code class="sourceCode R"><span><span class="va">hb</span><span class="op">&lt;-</span><span class="fu"><a href="reference/getHarmBound.html">getHarmBound</a></span><span class="op">(</span>nevents <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span><span class="fl">10</span>, <span class="fl">100</span>, by <span class="op">=</span> <span class="fl">10</span><span class="op">)</span>, alpha_test <span class="op">=</span> <span class="fl">0.025</span>, pH0 <span class="op">=</span> <span class="fl">0.5</span><span class="op">)</span></span>
 <span><span class="va">hb</span></span>
 <span><span class="co">#&gt; $bounds</span></span>
-<span><span class="co">#&gt;    events events_exp events_control       rr alpha_test pH0 stop_prob_H0</span></span>
-<span><span class="co">#&gt; 1      10          9              1 9.000000      0.025 0.5  0.010742188</span></span>
-<span><span class="co">#&gt; 2      20         15              5 3.000000      0.025 0.5  0.016405106</span></span>
-<span><span class="co">#&gt; 3      30         21              9 2.333333      0.025 0.5  0.011266726</span></span>
-<span><span class="co">#&gt; 4      40         27             13 2.076923      0.025 0.5  0.007307253</span></span>
-<span><span class="co">#&gt; 5      50         33             17 1.941176      0.025 0.5  0.004798221</span></span>
-<span><span class="co">#&gt; 6      60         39             21 1.857143      0.025 0.5  0.003217823</span></span>
-<span><span class="co">#&gt; 7      70         44             26 1.692308      0.025 0.5  0.006730864</span></span>
-<span><span class="co">#&gt; 8      80         50             30 1.666667      0.025 0.5  0.003002399</span></span>
-<span><span class="co">#&gt; 9      90         55             35 1.571429      0.025 0.5  0.005713749</span></span>
-<span><span class="co">#&gt; 10    100         61             39 1.564103      0.025 0.5  0.002449994</span></span>
+<span><span class="co">#&gt;    events events_exp events_control alpha_test pH0 stop_prob_H0</span></span>
+<span><span class="co">#&gt; 1      10          9              1      0.025 0.5  0.010742188</span></span>
+<span><span class="co">#&gt; 2      20         15              5      0.025 0.5  0.016405106</span></span>
+<span><span class="co">#&gt; 3      30         21              9      0.025 0.5  0.011266726</span></span>
+<span><span class="co">#&gt; 4      40         27             13      0.025 0.5  0.007307253</span></span>
+<span><span class="co">#&gt; 5      50         33             17      0.025 0.5  0.004798221</span></span>
+<span><span class="co">#&gt; 6      60         39             21      0.025 0.5  0.003217823</span></span>
+<span><span class="co">#&gt; 7      70         44             26      0.025 0.5  0.006730864</span></span>
+<span><span class="co">#&gt; 8      80         50             30      0.025 0.5  0.003002399</span></span>
+<span><span class="co">#&gt; 9      90         55             35      0.025 0.5  0.005713749</span></span>
+<span><span class="co">#&gt; 10    100         61             39      0.025 0.5  0.002449994</span></span>
 <span><span class="co">#&gt;    cum_stop_prob_H0</span></span>
 <span><span class="co">#&gt; 1        0.01074219</span></span>
 <span><span class="co">#&gt; 2        0.02714729</span></span>
@@ -129,17 +129,17 @@
 <span><span class="va">hb</span><span class="op">&lt;-</span><span class="fu"><a href="reference/getHarmBound.html">getHarmBound</a></span><span class="op">(</span>nevents <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span><span class="fl">10</span>, <span class="fl">100</span>, by <span class="op">=</span> <span class="fl">10</span><span class="op">)</span>, alpha_test <span class="op">=</span> <span class="va">alphaPerTest</span>, pH0 <span class="op">=</span> <span class="fl">0.5</span><span class="op">)</span></span>
 <span><span class="va">hb</span> </span>
 <span><span class="co">#&gt; $bounds</span></span>
-<span><span class="co">#&gt;    events events_exp events_control       rr alpha_test pH0 stop_prob_H0</span></span>
-<span><span class="co">#&gt; 1      10          9              1 9.000000 0.01760014 0.5  0.010742188</span></span>
-<span><span class="co">#&gt; 2      20         16              4 4.000000 0.01760014 0.5  0.003862381</span></span>
-<span><span class="co">#&gt; 3      30         22              8 2.750000 0.01760014 0.5  0.004922465</span></span>
-<span><span class="co">#&gt; 4      40         28             12 2.333333 0.01760014 0.5  0.003896854</span></span>
-<span><span class="co">#&gt; 5      50         33             17 1.941176 0.01760014 0.5  0.008795958</span></span>
-<span><span class="co">#&gt; 6      60         39             21 1.857143 0.01760014 0.5  0.004049838</span></span>
-<span><span class="co">#&gt; 7      70         45             25 1.800000 0.01760014 0.5  0.002581452</span></span>
-<span><span class="co">#&gt; 8      80         50             30 1.666667 0.01760014 0.5  0.005311134</span></span>
-<span><span class="co">#&gt; 9      90         56             34 1.647059 0.01760014 0.5  0.002363631</span></span>
-<span><span class="co">#&gt; 10    100         61             39 1.564103 0.01760014 0.5  0.004516510</span></span>
+<span><span class="co">#&gt;    events events_exp events_control alpha_test pH0 stop_prob_H0</span></span>
+<span><span class="co">#&gt; 1      10          9              1 0.01760014 0.5  0.010742188</span></span>
+<span><span class="co">#&gt; 2      20         16              4 0.01760014 0.5  0.003862381</span></span>
+<span><span class="co">#&gt; 3      30         22              8 0.01760014 0.5  0.004922465</span></span>
+<span><span class="co">#&gt; 4      40         28             12 0.01760014 0.5  0.003896854</span></span>
+<span><span class="co">#&gt; 5      50         33             17 0.01760014 0.5  0.008795958</span></span>
+<span><span class="co">#&gt; 6      60         39             21 0.01760014 0.5  0.004049838</span></span>
+<span><span class="co">#&gt; 7      70         45             25 0.01760014 0.5  0.002581452</span></span>
+<span><span class="co">#&gt; 8      80         50             30 0.01760014 0.5  0.005311134</span></span>
+<span><span class="co">#&gt; 9      90         56             34 0.01760014 0.5  0.002363631</span></span>
+<span><span class="co">#&gt; 10    100         61             39 0.01760014 0.5  0.004516510</span></span>
 <span><span class="co">#&gt;    cum_stop_prob_H0</span></span>
 <span><span class="co">#&gt; 1        0.01074219</span></span>
 <span><span class="co">#&gt; 2        0.01460457</span></span>
@@ -220,17 +220,17 @@
 <span><span class="va">hb</span><span class="op">&lt;-</span><span class="fu"><a href="reference/getHarmBound.html">getHarmBound</a></span><span class="op">(</span>nevents <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span><span class="fl">10</span>, <span class="fl">100</span>, by <span class="op">=</span> <span class="fl">10</span><span class="op">)</span>, alpha_test <span class="op">=</span> <span class="fl">0.025</span>, pH0 <span class="op">=</span> <span class="fl">0.5</span>, pH1 <span class="op">=</span> <span class="fl">0.6</span><span class="op">)</span></span>
 <span><span class="va">hb</span></span>
 <span><span class="co">#&gt; $bounds</span></span>
-<span><span class="co">#&gt;    events events_exp events_control       rr alpha_test pH0 stop_prob_H0</span></span>
-<span><span class="co">#&gt; 1      10          9              1 9.000000      0.025 0.5  0.010742188</span></span>
-<span><span class="co">#&gt; 2      20         15              5 3.000000      0.025 0.5  0.016405106</span></span>
-<span><span class="co">#&gt; 3      30         21              9 2.333333      0.025 0.5  0.011266726</span></span>
-<span><span class="co">#&gt; 4      40         27             13 2.076923      0.025 0.5  0.007307253</span></span>
-<span><span class="co">#&gt; 5      50         33             17 1.941176      0.025 0.5  0.004798221</span></span>
-<span><span class="co">#&gt; 6      60         39             21 1.857143      0.025 0.5  0.003217823</span></span>
-<span><span class="co">#&gt; 7      70         44             26 1.692308      0.025 0.5  0.006730864</span></span>
-<span><span class="co">#&gt; 8      80         50             30 1.666667      0.025 0.5  0.003002399</span></span>
-<span><span class="co">#&gt; 9      90         55             35 1.571429      0.025 0.5  0.005713749</span></span>
-<span><span class="co">#&gt; 10    100         61             39 1.564103      0.025 0.5  0.002449994</span></span>
+<span><span class="co">#&gt;    events events_exp events_control alpha_test pH0 stop_prob_H0</span></span>
+<span><span class="co">#&gt; 1      10          9              1      0.025 0.5  0.010742188</span></span>
+<span><span class="co">#&gt; 2      20         15              5      0.025 0.5  0.016405106</span></span>
+<span><span class="co">#&gt; 3      30         21              9      0.025 0.5  0.011266726</span></span>
+<span><span class="co">#&gt; 4      40         27             13      0.025 0.5  0.007307253</span></span>
+<span><span class="co">#&gt; 5      50         33             17      0.025 0.5  0.004798221</span></span>
+<span><span class="co">#&gt; 6      60         39             21      0.025 0.5  0.003217823</span></span>
+<span><span class="co">#&gt; 7      70         44             26      0.025 0.5  0.006730864</span></span>
+<span><span class="co">#&gt; 8      80         50             30      0.025 0.5  0.003002399</span></span>
+<span><span class="co">#&gt; 9      90         55             35      0.025 0.5  0.005713749</span></span>
+<span><span class="co">#&gt; 10    100         61             39      0.025 0.5  0.002449994</span></span>
 <span><span class="co">#&gt;    cum_stop_prob_H0 pH1 stop_prob_H1 cum_stop_prob_H1</span></span>
 <span><span class="co">#&gt; 1        0.01074219 0.6   0.04635740        0.0463574</span></span>
 <span><span class="co">#&gt; 2        0.02714729 0.6   0.09503665        0.1413940</span></span>
@@ -255,17 +255,17 @@
 <span><span class="va">hb</span><span class="op">&lt;-</span><span class="fu"><a href="reference/getHarmBound.html">getHarmBound</a></span><span class="op">(</span>nevents <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span><span class="fl">10</span>, <span class="fl">100</span>, by <span class="op">=</span> <span class="fl">10</span><span class="op">)</span>, alpha_test <span class="op">=</span> <span class="fl">0.025</span>, pH0 <span class="op">=</span> <span class="fl">0.5</span>, rrH1 <span class="op">=</span> <span class="fl">1.5</span><span class="op">)</span></span>
 <span><span class="va">hb</span></span>
 <span><span class="co">#&gt; $bounds</span></span>
-<span><span class="co">#&gt;    events events_exp events_control       rr alpha_test pH0 stop_prob_H0</span></span>
-<span><span class="co">#&gt; 1      10          9              1 9.000000      0.025 0.5  0.010742188</span></span>
-<span><span class="co">#&gt; 2      20         15              5 3.000000      0.025 0.5  0.016405106</span></span>
-<span><span class="co">#&gt; 3      30         21              9 2.333333      0.025 0.5  0.011266726</span></span>
-<span><span class="co">#&gt; 4      40         27             13 2.076923      0.025 0.5  0.007307253</span></span>
-<span><span class="co">#&gt; 5      50         33             17 1.941176      0.025 0.5  0.004798221</span></span>
-<span><span class="co">#&gt; 6      60         39             21 1.857143      0.025 0.5  0.003217823</span></span>
-<span><span class="co">#&gt; 7      70         44             26 1.692308      0.025 0.5  0.006730864</span></span>
-<span><span class="co">#&gt; 8      80         50             30 1.666667      0.025 0.5  0.003002399</span></span>
-<span><span class="co">#&gt; 9      90         55             35 1.571429      0.025 0.5  0.005713749</span></span>
-<span><span class="co">#&gt; 10    100         61             39 1.564103      0.025 0.5  0.002449994</span></span>
+<span><span class="co">#&gt;    events events_exp events_control alpha_test pH0 stop_prob_H0</span></span>
+<span><span class="co">#&gt; 1      10          9              1      0.025 0.5  0.010742188</span></span>
+<span><span class="co">#&gt; 2      20         15              5      0.025 0.5  0.016405106</span></span>
+<span><span class="co">#&gt; 3      30         21              9      0.025 0.5  0.011266726</span></span>
+<span><span class="co">#&gt; 4      40         27             13      0.025 0.5  0.007307253</span></span>
+<span><span class="co">#&gt; 5      50         33             17      0.025 0.5  0.004798221</span></span>
+<span><span class="co">#&gt; 6      60         39             21      0.025 0.5  0.003217823</span></span>
+<span><span class="co">#&gt; 7      70         44             26      0.025 0.5  0.006730864</span></span>
+<span><span class="co">#&gt; 8      80         50             30      0.025 0.5  0.003002399</span></span>
+<span><span class="co">#&gt; 9      90         55             35      0.025 0.5  0.005713749</span></span>
+<span><span class="co">#&gt; 10    100         61             39      0.025 0.5  0.002449994</span></span>
 <span><span class="co">#&gt;    cum_stop_prob_H0 pH1 stop_prob_H1 cum_stop_prob_H1</span></span>
 <span><span class="co">#&gt; 1        0.01074219 0.6   0.04635740        0.0463574</span></span>
 <span><span class="co">#&gt; 2        0.02714729 0.6   0.09503665        0.1413940</span></span>
