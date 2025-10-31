@@ -17,3 +17,7 @@ specification of alternative in getHarmBound
 harmBounds 0.3.1
 ------------------
 remove rr from harmBound output
+
+harmBounds 0.3.2
+------------------
+bug fix

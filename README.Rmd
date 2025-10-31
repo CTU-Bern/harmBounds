@@ -42,6 +42,7 @@ devtools::install_github("CTU-Bern/harmBounds")
 
 ```{r, echo=FALSE, results="hide", warning=FALSE, message=FALSE}
 devtools::load_all()
+options(width = 200)
 ```
 
 ## Calculation of boundaries

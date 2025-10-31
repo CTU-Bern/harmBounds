@@ -60,7 +60,7 @@ harmboundPlot<-function(harmbound,
 		scale_y_continuous(limits=c(0,xmax+1)) +
 		scale_x_continuous(limits=c(0,xmax+1)) +
 		xlab("Total number of events") +
-		ylab("Number of events in experimental groups")
+		ylab("Number of events in experimental group")
 
 	if (!is.null(observed)) {
 		out<-out +
