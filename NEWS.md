@@ -21,3 +21,7 @@ remove rr from harmBound output
 harmBounds 0.3.2
 ------------------
 bug fix
+
+harmBounds 0.3.3
+------------------
+harmbound_plot: set stopping boundary completely in red area instead of at the border
