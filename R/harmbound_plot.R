@@ -51,11 +51,11 @@ harmboundPlot<-function(harmbound,
 	out<-ggplot() +
 		geom_rect(data=harmbound,
 			mapping=aes(xmin=.data$events-0.5, xmax=.data$events+0.5,
-			ymin=0, ymax=.data$events_exp),
+			ymin=0, ymax=.data$events_exp-0.5),
 			color=NA, fill=colourbound[1], alpha=fill_alpha) +
 		geom_rect(data=harmbound,
 			mapping=aes(xmin=.data$events-0.5, xmax=.data$events+0.5,
-			ymin=.data$events_exp, ymax=.data$events),
+			ymin=.data$events_exp-0.5, ymax=.data$events),
 			color=NA, fill=colourbound[2], alpha=fill_alpha) +
 		scale_y_continuous(limits=c(0,xmax+1)) +
 		scale_x_continuous(limits=c(0,xmax+1)) +
