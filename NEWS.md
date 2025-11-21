@@ -25,3 +25,10 @@ bug fix
 harmBounds 0.3.3
 ------------------
 harmbound_plot: set stopping boundary completely in red area instead of at the border
+
+harmBounds 0.4.0
+------------------
+Major changes in the syntax of all functions
+Add individual stopping probabilites for all alternatives 
+Add number of expected events
+Add new plotting functionality

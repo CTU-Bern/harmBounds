@@ -16,7 +16,7 @@ getAlphaPerTest(
 
 \item{totalAlpha}{Overall type I error, 0.05 by default}
 
-\item{pH0}{proportion of events in the experimental arm under the null hypothesis,
+\item{pH0}{proportion of events in the intervention arm under the null hypothesis,
 typically based on randomization ratio (e.g. 0.5 for a 1:1 randomization)}
 
 \item{alpha.interval}{Range for test-wise alpha, c(10^(-10),0.05) by default}
@@ -28,7 +28,9 @@ Test-wide alpha
 Test-wise alpha necessary to control the overall type I error at a specified level (0.05 by default)
 }
 \examples{
-getAlphaPerTest(nevents = c(10,50,100), totalAlpha = 0.05, pH0 = 0.5)
+apt<-getAlphaPerTest(nevents = c(10,50,100), totalAlpha = 0.05, pH0 = 0.5)
+apt
+getHarmBound(nevents = c(10,50,100),alpha_test = apt, pH0 = 0.5)
 
 
 }
