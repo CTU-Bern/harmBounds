@@ -3,8 +3,10 @@ Type: Package
 Title: Harm Boundaries for Clinical Trials
 Version: 0.4.0
 Author: Yunda, Lukas
-Maintainer: The package maintainer <lukas.buetikofer@unibe.ch>
-Description: Calculates boundaries, simulates data and generates plots for saftey monitoring.
+Maintainer: Lukas Bütikofer <lukas.buetikofer@unibe.ch>
+Description: The harmBounds package calculates stopping probabilities, 
+	defines stopping boundaries and generates 
+	plots for safety monitoring using an event based approach.
 License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
@@ -18,4 +20,4 @@ Imports:
     ggplot2,
 	dplyr
 Depends: 
-    R (>= 2.10)
+    R (>= 4.10)

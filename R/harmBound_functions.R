@@ -268,7 +268,6 @@ getHarmBound <- function(nevents,alpha_test,pH0,
 		}
 		if (!is.null(rdH1)) {
 			outc<-cbind(outc,rd=c(1,rdH1)[i],r0=r0,n=n)
-			outc<-outc[,c("hyp","p","rd","r0","n","cum_stop_prob","expected_events")]
 			outc<-outc |> 
 				dplyr::relocate(.data$rd, .after = .data$p) |>
 				dplyr::relocate(.data$r0, .after = .data$rd) |>
