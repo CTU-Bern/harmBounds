@@ -20,4 +20,4 @@ Imports:
     ggplot2,
 	dplyr
 Depends: 
-    R (>= 4.10)
+    R (>= 4.1)
