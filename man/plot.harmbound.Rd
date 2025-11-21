@@ -4,13 +4,25 @@
 \alias{plot.harmbound}
 \title{Plot method for harmbound objects produced by \code{getHarmBound}}
 \usage{
-\method{plot}{harmbound}(x, ...)
+\method{plot}{harmbound}(x, which = "bounds", ...)
 }
 \arguments{
 \item{x}{harmbounds objects as generated using the getHarmBound function}
 
-\item{...}{further arguments for getHarmBound}
+\item{which}{one of \code{"bounds"}, \code{"abs_stopping"}, \code{"cum_stopping"}, \code{"exp_n"}.}
+
+\item{...}{options passed to plot}
 }
 \description{
 Plot method for harmbound objects produced by \code{getHarmBound}
+}
+\examples{
+harmbound<-getHarmBound(nevents = seq(10, 100, by=10),alpha_test = 0.025,
+pH0 = 0.5, pH1 = seq(0.55,0.7,by=0.05), maxevents = 150)
+plot(harmbound, which = "bounds")
+plot(harmbound, which = "abs_stopping")
+plot(harmbound, which = "cum_stopping")
+plot(harmbound, which = "opchar_stop")
+plot(harmbound, which = "opchar_n")
+
 }

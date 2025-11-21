@@ -7,7 +7,7 @@
 #'
 #' @param nevents vector with number of events at which an interim analysis is done
 #' @param totalAlpha Overall type I error, 0.05 by default
-#' @param pH0 proportion of events in the experimental arm under the null hypothesis,
+#' @param pH0 proportion of events in the intervention arm under the null hypothesis,
 #'	typically based on randomization ratio (e.g. 0.5 for a 1:1 randomization)
 #' @param alpha.interval Range for test-wise alpha, c(10^(-10),0.05) by default
 #'
@@ -18,7 +18,9 @@
 #' @importFrom stats uniroot
 #'
 #' @examples
-#'	getAlphaPerTest(nevents = c(10,50,100), totalAlpha = 0.05, pH0 = 0.5)
+#'	apt<-getAlphaPerTest(nevents = c(10,50,100), totalAlpha = 0.05, pH0 = 0.5)
+#'	apt
+#'	getHarmBound(nevents = c(10,50,100),alpha_test = apt, pH0 = 0.5)
 #'
 #'
 getAlphaPerTest <- function(nevents,
@@ -31,7 +33,7 @@ getAlphaPerTest <- function(nevents,
                           nevents = nevents,
                           alpha_test = alphaPerTest,
                           pH0 = pH0)
-        return(harmBounds$bounds$cum_stop_prob[nrow(harmBounds$bound)] - totalAlpha)
+        return(harmBounds$opchar[1,"cum_stop_prob"] - totalAlpha)
     }
 
 	ur<-uniroot(getCumAlpha, interval = alpha.interval, tol=1e-7,
@@ -45,35 +47,37 @@ getAlphaPerTest <- function(nevents,
 
 #' Harm boundaries for safety testing
 #'
-#' Calculates the boundaries at each interim analysis, i.e. the number of events in the experimental group
+#' Calculates the boundaries at each interim analysis, i.e. the number of events in the intervention group
 #' that would lead to a stopping of the trial based on a binomial exact test,
 #' assuming that the events should be equally distributed amont both groups.
 #' The indicated scenario (and all more extreme) would lead to a rejection of H0 (equal distribution) and a stopping for safety.
 #'
-#' @param nevents vector with number of events at which an interim analysis is done
+#' @param nevents vector with number of events (over both arms) at which an interim analysis is done
 #' @param alpha_test the nominal alpha level to use for each test
-#' @param pH0 proportion of events in the experimental arm under the null hypothesis,
+#' @param pH0 proportion of events in the intervention arm under the null hypothesis,
 #'	typically based on randomization ratio (e.g. 0.5 for a 1:1 randomization)
-#' @param pH1 optional alternative, numeric vector, proportion of events in the experimental arm
-#' @param rrH1 alternative specification of alternative as risk ratio (experimental / control)
-#' @param orH1 alternative specification of alternative as risk ratio (experimental / control). Requires the control proportion (r0).
-#' @param rdH1 alternative specification of alternative as risk difference (experimental - control). Requires the control proportion (r0) and the number of participants (n).
+#' @param maxevents optional maximum number of events expected for the trial (over both arms), used to calculate the expected number of events
+#' @param pH1 optional alternative, numeric vector, proportion of events in the intervention arm
+#' @param rrH1 alternative specification of alternative as risk ratio (intervention / control)
+#' @param orH1 alternative specification of alternative as risk ratio (intervention / control). Requires the control proportion (r0).
+#' @param rdH1 alternative specification of alternative as risk difference (intervention - control). Requires the control proportion (r0) and the number of participants (n).
 #' @param r0 risk in the control group. Required if the alternative is given as risk difference or odds ratio.
 #' @param n total number of participants. Required if the alternative is given as risk difference.
-#' @return a list with 2 data frames: bounds and cum_stop_prob.
+#' @return a list with 3 data.frames: bounds, stopprob and opchar.
 #' bounds has a row for each interim analysis and columns for
-#'	number of events (n),
-#'	number of events in control and experimental group that would lead to a stop (n_treat, n_control),
-#'	and the nominal alpha for each test (alpha_test)
-#'  the null proportion (pH0),
-#'	sopping probability (stop_prob_H0), and
-#'	cumulative stopping probability (cum_stop_prob_H1), and
-#'  if pH1!=NULL,
-#'	the alternative proportion (pH1, first one if pH1 has length>1),
-#'	sopping probability under the first H1 (stop_prob_H1),
-#'	cumulative stopping probability under the first H1 (cum_stop_prob).
-#'	cum_stop_prob includes the cumulative stopping probabilities for
-#'	the null and each alternative.
+#'	number of events (events),
+#'	number of events in control and intervention group that would lead to a stop
+#'	(events_intervention, events_control), and the nominal alpha for each test (alpha_test).
+#'  stopprob has a row for each interim analysis and columns for
+#'	number of events (events),
+#'	the hypothesis (pH),
+#'	the stopping probability (stop_prob), and
+#'	the cumulative stopping probability (cum_stop_prob)
+#'	opchar has a row for each hypothesis (null plus each alternative) and columns 
+#'	for the assumed proportion of events in the intervention group (p),
+#'	the cumulative stopping probabilities (cum_stop_prob) and 
+#'	the expected total number of events (expected_events)
+#'	for the null and each alternative.
 #'
 #'
 #' @export
@@ -84,13 +88,19 @@ getAlphaPerTest <- function(nevents,
 #' getHarmBound(nevents=c(10,50,100), alpha_test=0.025, pH0=0.5)
 #' #adding an alternative
 #' getHarmBound(nevents=c(10,50,100), alpha_test=0.025, pH0=0.5, pH1=0.6)
+#' #assume that a total of 150 events might occur
+#' getHarmBound(nevents=c(10,50,100), alpha_test=0.025, pH0=0.5, pH1=0.6, maxevents=150)
 #' #or several alternatives
-#' getHarmBound(nevents=c(10,50,100), alpha_test=0.025, pH0=0.5, pH1=seq(0,1,by=0.1))
+#' getHarmBound(nevents=c(10,50,100), alpha_test=0.025, pH0=0.5,
+#'	pH1 = seq(0.6,0.8,by=0.05), maxevents=150)
 #' #or as risk ratio
-#' getHarmBound(nevents=c(10,50,100), alpha_test=0.025, pH0=0.5, rrH1=1.5)
+#' getHarmBound(nevents=c(10,50,100), alpha_test=0.025, pH0=0.5, rrH1=1.5, maxevents=150)
+
 
 getHarmBound <- function(nevents,alpha_test,pH0,
-	pH1=NULL, rrH1=NULL, orH1=NULL,rdH1=NULL,
+	maxevents=NULL,
+	pH1=NULL, 
+	rrH1=NULL, orH1=NULL,rdH1=NULL,
 	r0=NULL, n=NULL){
 
 	#check alternative
@@ -98,7 +108,16 @@ getHarmBound <- function(nevents,alpha_test,pH0,
 	if (nn>1) {
 		stop("Only one of pH1, rdH1, rrH1, or rrH1 should be entered.")
 	}
-
+	
+	#check maxevents 
+	if (!is.null(maxevents)) {
+		if (maxevents<max(nevents)) {
+			stop("maxevents has to be larger or equal than the maximum of nevents")
+		}
+	} else {
+		maxevents<-max(nevents)
+	}
+	
 	if (!is.null(rdH1) | !is.null(rrH1) | !is.null(orH1)) {
 
 		if (!is.null(rrH1)) {
@@ -184,86 +203,92 @@ getHarmBound <- function(nevents,alpha_test,pH0,
 		}
 
 	}
-
-	if (!all(is.na(bounds$treatBound))) {
-		out <- pNS(Bounds=bounds$treatBound, pH0=pH0)
-		outc<-data.frame(p=pH0,cum_stop_prob=out$totalStopProb,hyp="H0")
-
-		if (!is.null(pH1)) {
-			#first one complete
-			outH1 <- pNS(Bounds=bounds$treatBound, pH0=pH1[1])
-			#rest
-			outcH1<-sapply(pH1,function(x)
-				pNS(Bounds=bounds$treatBound, pH0=x)$totalStopProb)
-			outc<-rbind(outc,data.frame(p=pH1,cum_stop_prob=outcH1,hyp="H1"))
-			outc<-outc[,c("hyp","p","cum_stop_prob")]
-			if (!is.null(rrH1)) {
-				outc<-cbind(outc,rr=c(1,rrH1))
-				outc<-outc[,c("hyp","p","rr","cum_stop_prob")]
-			}
-			if (!is.null(orH1)) {
-				outc<-cbind(outc,or=c(1,orH1),r0=r0)
-				outc<-outc[,c("hyp","p","or","r0","cum_stop_prob")]
-			}
-			if (!is.null(rdH1)) {
-				outc<-cbind(outc,rd=c(1,rdH1),r0=r0,n=n)
-				outc<-outc[,c("hyp","p","rd","r0","n","cum_stop_prob")]
-			}
+	
+	
+	#bounds:
+	assumpt<-c(pH0,pH1)
+	
+	stopprob<-vector(length=1+length(pH1),mode="list")
+	names(stopprob)<-assumpt
+	cumstop<-numeric(0)
+	
+	i<-1
+	for (i in 1:length(assumpt)) {
+		
+		hyp<-ifelse(i==1,"H0","H1")
+					
+		if (!all(is.na(bounds$treatBound))) {	
+			out <- pNS(Bounds=bounds$treatBound, pH0=assumpt[i])
+			nstop<-sum(out$Bounds$n*out$Stop,(1-out$totalStopProb)*maxevents)
+			outc<-data.frame(p=assumpt[i],cum_stop_prob=out$totalStopProb,
+				expected_events=nstop,hyp=hyp)			
+		} else {
+			nr <- nrow(bounds)
+			out <- list(Bounds= data.frame(n=1:nr,StoppingBound = bounds$treatBound),
+				Stop = rep(0, nr),cutoff = bounds$cutoff)
+			outc<-data.frame(p=pH0,cum_stop_prob=0,expected_events=maxevents,hyp=hyp)	
+		}		
+		
+		#Boundaries
+		if (i==1) {
+			boundOut<-out$Bounds
+			names(boundOut)[names(boundOut)=="n"] <- "events"
+			names(boundOut)[names(boundOut)=="StoppingBound"] <- "events_intervention"
+			boundOut$events_control <- boundOut$events - boundOut$events_intervention		
+			boundOut <- cbind(boundOut,alpha_test = bounds$cutoff)
+			
+			stopifnot(is.na(boundOut[!boundOut$events %in% nevents,"events_intervention"]))
+			boundOutna<-boundOut[boundOut$events %in% nevents, ]
+			rownames(boundOutna)<-1:nrow(boundOutna)
 		}
-	} else {
-		nr <- nrow(bounds)
-		out <- list(Bounds= data.frame(
-							n=1:nr,
-							StoppingBound = bounds$treatBound ),
-				Stop = rep(0, nr),
-				cutoff = bounds$cutoff)
-		outc<-data.frame(p=pH0,cum_stop_prob=0,hyp="H0")
-
-		if (!is.null(pH1)) {
-			outc<-rbind(outc,
-				data.frame(p=pH1,cum_stop_prob=rep(0,length(pH1)),hyp="H0"))
+		
+		#Stopping probs 
+		sprobi <- data.frame(events=boundOut$events,
+			pH = assumpt[i],
+			hyp = hyp,
+			stop_prob = out$Stop,
+			cum_stop_prob=cumsum(out$Stop))
+		
+		stopifnot(sprobi[!sprobi$events %in% nevents,"stop_prob"]==0)
+		sprobi<-sprobi[sprobi$events %in% nevents, ]
+		rownames(sprobi)<-1:nrow(sprobi)
+		
+		stopprob[[i]]<-sprobi
+		
+		#summary
+		if (!is.null(rrH1)) {
+			outc<-cbind(outc,rr=c(1,rrH1)[i])
+			outc<-outc |> dplyr::relocate(rr, .after = .data$p)
 		}
+		if (!is.null(orH1)) {
+			outc<-cbind(outc,or=c(1,orH1)[i],r0 = .data$r0)
+			outc<-outc |> 
+				dplyr::relocate(.data$or, .after = .data$p) |>
+				dplyr::relocate(.data$r0, .after = .data$or)
+		}
+		if (!is.null(rdH1)) {
+			outc<-cbind(outc,rd=c(1,rdH1)[i],r0=r0,n=n)
+			outc<-outc[,c("hyp","p","rd","r0","n","cum_stop_prob","expected_events")]
+			outc<-outc |> 
+				dplyr::relocate(.data$rd, .after = .data$p) |>
+				dplyr::relocate(.data$r0, .after = .data$rd) |>
+				dplyr::relocate(.data$n, .after = .data$r0)
+		}
+			
+		cumstop<-rbind(cumstop,outc)
+	
 	}
-
-	names(out$Bounds)[names(out$Bounds)=="StoppingBound"] <- "n_treat"
-	boundOut <- within(out$Bounds, {
-						n_control <- n-n_treat
-						rr <- n_treat*(1-pH0)/(n_control*pH0)
-					})
-	boundOut <- cbind(boundOut,
-					stop_prob = out$Stop,
-					cum_stop_prob=cumsum(out$Stop),
-					alpha_test = bounds$cutoff,
-					pH0 = pH0)
-
-	ord.columns <- c("n","n_treat","n_control",
-		"alpha_test","pH0","stop_prob","cum_stop_prob")
-	boundOut <- boundOut[, ord.columns]
-	colnames(boundOut)<-c("events","events_exp","events_control",
-		"alpha_test",
-		"pH0","stop_prob_H0","cum_stop_prob_H0")
-
-	# add alternative if one
-	if (!is.null(pH1)) {
-		boundOut<-cbind(boundOut,
-			pH1=pH1[1],
-			stop_prob_H1=outH1$Stop,
-			cum_stop_prob_H1=cumsum(outH1$Stop))
-
-	}
-
-	#only show those done:
-	boundOutna<-boundOut[boundOut$events %in% nevents, ]
-	rownames(boundOutna)<-1:nrow(boundOutna)
-
+	
 	#combine
-	boundOutna<-list(boundOutna,outc)
-	names(boundOutna)<-c("bounds","cum_stop_prob")
+		
+	res<-list(boundOutna,stopprob,cumstop)
+	names(res)<-c("bounds","stopprob","opchar")
 
-	class(boundOutna) <- c("harmbound", class(boundOutna))
+	class(res) <- c("harmbound", class(res))
 
-	return(boundOutna)
+	return(res)
 }
+
 
 
 #' Title
@@ -274,7 +299,7 @@ getHarmBound <- function(nevents,alpha_test,pH0,
 #'
 #' @param Bounds Vector of stopping bounds after each event.
 #'	For event totals where stopping is not permitted the 'Bound' should be set to NA.
-#' @param pH0 proportion of events in the experimental arm under the null hypothesis,
+#' @param pH0 proportion of events in the intervention arm under the null hypothesis,
 #'	typically based on randomization ratio (e.g. 0.5 for a 1:1 randomization)
 #' @param returnPns Whether to inlcude the binomial random walk in the output
 #'
@@ -378,18 +403,18 @@ pNS <- function(Bounds, pH0=0.5, returnPns=FALSE){
 }
 
 
-#' Convert the proportion of events in the experimental groups to risk differences and ratios and vice versa.
+#' Convert the proportion of events in the intervention groups to risk differences and ratios and vice versa.
 #'
-#' @param eprop proportion of events in experimental group
+#' @param eprop proportion of events in intervention group
 #' @param etotal total number of events
 #' @param rd risk difference
 #' @param rr risk ratio
 #' @param or odds ratio
 #' @param r0 risk in the control group
 #' @param n0 number of patients in the control group
-#' @param n1 number of patients in the experimental group
+#' @param n1 number of patients in the intervention group
 #'
-#' @return vector with risks in control and experimental group (r0, r1),
+#' @return vector with risks in control and intervention group (r0, r1),
 #'	the risk difference (rd), risk ratio (rr) and odds ratio (or)
 #'
 #' @export
@@ -425,7 +450,7 @@ convertRisks<-function(eprop=NULL,etotal=NULL,
 	if (!is.null(rd) | !is.null(rr) | !is.null(or)) {
 
 		if (is.null(r0)) {
-			stop("r0 has to be given for conversion to proportion of events in experimental group.")
+			stop("r0 has to be given for conversion to proportion of events in intervention group.")
 		}
 
 		if (!is.null(rd)) {

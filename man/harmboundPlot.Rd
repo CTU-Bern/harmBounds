@@ -18,7 +18,7 @@ harmboundPlot(
 
 \item{observed}{optional observed number of events,
 as a vector with the sequential groups in which an event occured
-(0 for control and 1 for experimental)}
+(0 for control and 1 for intervention)}
 
 \item{colourbound}{vector with two colours for the bounds, in and out, default is blue and red}
 
@@ -35,10 +35,10 @@ plot with the bounds and optionally the observed number of events
 Plot harmbounds and the observed events
 }
 \examples{
-hb<-getHarmBound(nevents=seq(10,100,by=10),alpha_test=0.025,pH0=0.5)
-harmboundPlot(hb)
+harmbound<-getHarmBound(nevents=seq(10,100,by=10),alpha_test=0.025,pH0=0.5)
+harmboundPlot(harmbound)
 set.seed(123)
 eventgroups<-rbinom(n=100,size=1,prob=0.5)
-harmboundPlot(hb,observed=eventgroups)
+harmboundPlot(harmbound,observed=eventgroups)
 
 }

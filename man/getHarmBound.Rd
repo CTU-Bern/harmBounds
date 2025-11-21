@@ -8,6 +8,7 @@ getHarmBound(
   nevents,
   alpha_test,
   pH0,
+  maxevents = NULL,
   pH1 = NULL,
   rrH1 = NULL,
   orH1 = NULL,
@@ -17,43 +18,46 @@ getHarmBound(
 )
 }
 \arguments{
-\item{nevents}{vector with number of events at which an interim analysis is done}
+\item{nevents}{vector with number of events (over both arms) at which an interim analysis is done}
 
 \item{alpha_test}{the nominal alpha level to use for each test}
 
-\item{pH0}{proportion of events in the experimental arm under the null hypothesis,
+\item{pH0}{proportion of events in the intervention arm under the null hypothesis,
 typically based on randomization ratio (e.g. 0.5 for a 1:1 randomization)}
 
-\item{pH1}{optional alternative, numeric vector, proportion of events in the experimental arm}
+\item{maxevents}{optional maximum number of events expected for the trial (over both arms), used to calculate the expected number of events}
 
-\item{rrH1}{alternative specification of alternative as risk ratio (experimental / control)}
+\item{pH1}{optional alternative, numeric vector, proportion of events in the intervention arm}
 
-\item{orH1}{alternative specification of alternative as risk ratio (experimental / control). Requires the control proportion (r0).}
+\item{rrH1}{alternative specification of alternative as risk ratio (intervention / control)}
 
-\item{rdH1}{alternative specification of alternative as risk difference (experimental - control). Requires the control proportion (r0) and the number of participants (n).}
+\item{orH1}{alternative specification of alternative as risk ratio (intervention / control). Requires the control proportion (r0).}
+
+\item{rdH1}{alternative specification of alternative as risk difference (intervention - control). Requires the control proportion (r0) and the number of participants (n).}
 
 \item{r0}{risk in the control group. Required if the alternative is given as risk difference or odds ratio.}
 
 \item{n}{total number of participants. Required if the alternative is given as risk difference.}
 }
 \value{
-a list with 2 data frames: bounds and cum_stop_prob.
+a list with 3 data.frames: bounds, stopprob and opchar.
 bounds has a row for each interim analysis and columns for
-number of events (n),
-number of events in control and experimental group that would lead to a stop (n_treat, n_control),
-and the nominal alpha for each test (alpha_test)
- the null proportion (pH0),
-sopping probability (stop_prob_H0), and
-cumulative stopping probability (cum_stop_prob_H1), and
- if pH1!=NULL,
-the alternative proportion (pH1, first one if pH1 has length>1),
-sopping probability under the first H1 (stop_prob_H1),
-cumulative stopping probability under the first H1 (cum_stop_prob).
-cum_stop_prob includes the cumulative stopping probabilities for
-the null and each alternative.
+number of events (events),
+number of events in control and intervention group that would lead to a stop
+(events_intervention, events_control), and the nominal alpha for each test (alpha_test).
+ stopprob has a row for each interim analysis and columns for
+number of events (events),
+the hypothesis (pH),
+the stopping probability (stop_prob), and
+the cumulative stopping probability (cum_stop_prob)
+opchar has a row for each hypothesis (null plus each alternative) and columns 
+for the assumed proportion of events in the intervention group (p),
+the cumulative stopping probabilities (cum_stop_prob) and 
+the expected total number of events (expected_events)
+for the null and each alternative.
 }
 \description{
-Calculates the boundaries at each interim analysis, i.e. the number of events in the experimental group
+Calculates the boundaries at each interim analysis, i.e. the number of events in the intervention group
 that would lead to a stopping of the trial based on a binomial exact test,
 assuming that the events should be equally distributed amont both groups.
 The indicated scenario (and all more extreme) would lead to a rejection of H0 (equal distribution) and a stopping for safety.
@@ -62,8 +66,11 @@ The indicated scenario (and all more extreme) would lead to a rejection of H0 (e
 getHarmBound(nevents=c(10,50,100), alpha_test=0.025, pH0=0.5)
 #adding an alternative
 getHarmBound(nevents=c(10,50,100), alpha_test=0.025, pH0=0.5, pH1=0.6)
+#assume that a total of 150 events might occur
+getHarmBound(nevents=c(10,50,100), alpha_test=0.025, pH0=0.5, pH1=0.6, maxevents=150)
 #or several alternatives
-getHarmBound(nevents=c(10,50,100), alpha_test=0.025, pH0=0.5, pH1=seq(0,1,by=0.1))
+getHarmBound(nevents=c(10,50,100), alpha_test=0.025, pH0=0.5,
+pH1 = seq(0.6,0.8,by=0.05), maxevents=150)
 #or as risk ratio
-getHarmBound(nevents=c(10,50,100), alpha_test=0.025, pH0=0.5, rrH1=1.5)
+getHarmBound(nevents=c(10,50,100), alpha_test=0.025, pH0=0.5, rrH1=1.5, maxevents=150)
 }
