@@ -4,12 +4,16 @@
 <url><loc>/authors.html</loc></url>
 <url><loc>/index.html</loc></url>
 <url><loc>/news/index.html</loc></url>
+<url><loc>/reference/absstopPlot.html</loc></url>
 <url><loc>/reference/convertRisks.html</loc></url>
+<url><loc>/reference/cumstopPlot.html</loc></url>
 <url><loc>/reference/findbound.html</loc></url>
 <url><loc>/reference/getAlphaPerTest.html</loc></url>
 <url><loc>/reference/getHarmBound.html</loc></url>
 <url><loc>/reference/harmboundPlot.html</loc></url>
 <url><loc>/reference/index.html</loc></url>
+<url><loc>/reference/opcharNPlot.html</loc></url>
+<url><loc>/reference/opcharStopPlot.html</loc></url>
 <url><loc>/reference/plot.harmbound.html</loc></url>
 <url><loc>/reference/simSafetyStop.html</loc></url>
 </urlset>
